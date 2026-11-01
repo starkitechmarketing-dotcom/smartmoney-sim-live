@@ -33,9 +33,11 @@ svg.ch{width:100%;height:150px;display:block;margin-top:6px}.tl{display:flex;jus
 .lg .d{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:6px;vertical-align:middle}.lg .t{opacity:.6;margin-right:6px}
 .sk{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;font-size:12.5px}.sk .n{float:right;font-weight:700}
 .bar{height:3px;background:rgba(255,255,255,.12);border-radius:2px;margin-top:3px}.bar i{display:block;height:100%;background:#e5e5e5;border-radius:2px;transition:width .6s}
+.tabs{display:flex;gap:6px;margin:10px 0 0;background:#111;border:1px solid #2a2a2a;border-radius:12px;padding:4px}.tabs button{flex:1;background:none;border:0;color:#aaa;font:700 15px inherit;padding:8px;border-radius:9px;cursor:pointer}.tabs button.on{background:#fff;color:#000}
 .mut{opacity:.55}.ft{text-align:center;font-size:11px;opacity:.6;margin-top:14px}
 </style></head><body><div class="w">
 <div class="hd"><div class="logo"><div class="av">🤖</div><div><h1>聪明钱跟单 · 模拟盘</h1><span class="sub">模拟，不动真钱</span></div></div><div id="live" class="live off"><span class="dot"></span><span id="lt">连接中</span></div></div>
+<div class="tabs" id="tabs"><button data-c="bsc" class="on">BSC</button><button data-c="sol">SOL</button></div>
 <div class="tk"><div class="tki" id="tk"></div></div>
 <div class="hero"><div class="eqh" id="eqh">Equity · 起始 $90</div><div class="big" id="big">$—</div>
 <div class="mult" id="mult">—×</div><div class="flt" id="flt"></div>
@@ -46,7 +48,7 @@ svg.ch{width:100%;height:150px;display:block;margin-top:6px}.tl{display:flex;jus
 <div class="card"><div class="ct"><h2>Why signals got skipped</h2><span class="m" id="bw"></span></div><div class="sk" id="sk"></div></div>
 <div class="ft" id="ft">约每分钟更新 · 时间为马来西亚时间（UTC+8）</div></div>
 <script>
-const RZ={'liquidity<20k':'流动性不足2万美元','too_old':'项目太老','top10_unknown':'读不到前十持仓','bulk_snipe_1m':'开盘首分钟批量扫单','up>90%_in_40m':'40分钟内涨超90%','top10>42%':'前十持仓超42%','dev>9%':'开发者持仓超9%','no_smart_money':'没有聪明钱买入','honeypot':'貔貅盘'};
+const RZ={'liquidity<20k':'流动性不足2万美元','too_old':'项目太老','top10_unknown':'读不到前十持仓','bulk_snipe_1m':'开盘首分钟批量扫单','up>90%_in_40m':'40分钟内涨超90%','top10>42%':'前十持仓超42%','dev>9%':'开发者持仓超9%','no_smart_money':'没有聪明钱买入','honeypot':'貔貅盘','mint_authority_active':'增发权限未放弃','freeze_authority_active':'冻结权限未放弃','authority_unknown':'读不到代币权限'};
 const SK=['liquidity<20k','too_old','top10_unknown','bulk_snipe_1m','up>90%_in_40m','top10>42%','dev>9%','no_smart_money'];
 const e=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const rz=r=>{if(RZ[r])return RZ[r];if(/^score</.test(r))return '评分不足 '+r.slice(5);return r};
@@ -57,7 +59,7 @@ const usd=v=>(v<0?'-':'+')+'$'+Math.abs(v).toFixed(2);
 const tok=n=>e(String(n||'?').split(' / ')[0]);
 const IC={s:'<circle cx="11" cy="11" r="6"/><path d="M16 16l5 5"/>',f:'<path d="M3 4h18l-7 8v6l-4 2v-8z"/>',a:'<path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',n:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4"/>',g:'<path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l4-5"/>'};
 const ic=(k,c)=>`<div class="ic" style="background:#1c1c1c"><svg viewBox="0 0 24 24">${IC[k]}</svg></div>`;
-let cur=null;
+let cur=null;let CH=location.hash==='#sol'?'sol':'bsc';
 function anim(to){const el=document.getElementById('big');const from=cur??to;cur=to;const t0=performance.now();
  const f=n=>{const p=Math.min(1,(n-t0)/700),v=from+(to-from)*(1-Math.pow(1-p,3));const [a,b]=v.toFixed(2).split('.');el.innerHTML=`$${Number(a).toLocaleString('en')}<small>.${b}</small>`;if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)}
 function chart(pts){const svg={set innerHTML(h){H('ch',h)}};if(!pts.length){svg.innerHTML='<text x="10" y="80" fill="#fff" opacity=".6" font-size="13">暂无资金数据</text>';return}
@@ -69,7 +71,7 @@ function chart(pts){const svg={set innerHTML(h){H('ch',h)}};if(!pts.length){svg.
  svg.innerHTML=`<defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
  <path d="${d} L${L[0]},150 L${P[0][0]},150Z" fill="url(#ag)"/><path d="${d}" fill="none" stroke="#fff" stroke-width="2.5" vector-effect="non-scaling-stroke"/>
  <circle cx="${L[0]}" cy="${L[1]}" r="5" fill="none" stroke="#fff" stroke-width="2"/><circle cx="${L[0]}" cy="${L[1]}" r="2" fill="#fff"/>`}
-async function tick(){let s;try{s=await (await fetch('data.json?t='+Date.now(),{cache:'no-store'})).json()}catch{setLive(false,'离线');return}
+async function tick(){let s;try{s=await (await fetch((CH==='sol'?'data-sol.json':'data.json')+'?t='+Date.now(),{cache:'no-store'})).json()}catch{setLive(false,'离线');return}
  const hts=s.heartbeat?.ts?Date.parse(s.heartbeat.ts):s.heartbeat_mtime,age=hts?(s.now-hts)/1000:1e9;const da=(Date.now()-s.now)/1000;const ok=age<180&&da<180;setLive(ok,ok?'Live':(da>=180?'数据延迟':'离线'));
  // ticker
  const seen=new Set(),tk=[];for(const g of s.signals||[]){if(seen.has(g.pool))continue;seen.add(g.pool);tk.push(g);if(tk.length>14)break}
@@ -116,5 +118,6 @@ async function tick(){let s;try{s=await (await fetch('data.json?t='+Date.now(),{
  document.getElementById('ft').textContent=`更新于 ${hms(s.now)} MYT · 每 5 秒检查 · 数据约每分钟推送`;}
 function H(id,h){const el=document.getElementById(id);if(el.dataset.h!==h){el.dataset.h=h;el.innerHTML=h}}
 function setLive(ok,t){document.getElementById('live').className='live'+(ok?'':' off');document.getElementById('lt').textContent=t}
-tick();setInterval(tick,5000);
+function setTab(c){CH=c;cur=null;history.replaceState(null,'',c==='sol'?'#sol':'#bsc');document.querySelectorAll('#tabs button').forEach(b=>b.className=b.dataset.c===c?'on':'');tick()}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.c));setTab(CH);setInterval(tick,5000);
 </script></body></html>
