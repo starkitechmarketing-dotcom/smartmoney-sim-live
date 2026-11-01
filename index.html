@@ -48,7 +48,7 @@ svg.ch{width:100%;height:150px;display:block;margin-top:6px}.tl{display:flex;jus
 <div class="card"><div class="ct"><h2>Why signals got skipped</h2><span class="m" id="bw"></span></div><div class="sk" id="sk"></div></div>
 <div class="ft" id="ft">约每分钟更新 · 时间为马来西亚时间（UTC+8）</div></div>
 <script>
-const RZ={'liquidity<20k':'流动性不足2万美元','too_old':'项目太老','top10_unknown':'读不到前十持仓','bulk_snipe_1m':'开盘首分钟批量扫单','up>90%_in_40m':'40分钟内涨超90%','top10>42%':'前十持仓超42%','dev>9%':'开发者持仓超9%','no_smart_money':'没有聪明钱买入','honeypot':'貔貅盘','mint_authority_active':'增发权限未放弃','freeze_authority_active':'冻结权限未放弃','authority_unknown':'读不到代币权限'};
+const RZ={'liquidity<20k':'流动性不足2万美元','too_old':'项目太老','top10_unknown':'读不到前十持仓','bulk_snipe_1m':'开盘首分钟批量扫单','up>90%_in_40m':'40分钟内涨超90%','top10>42%':'前十持仓超42%','dev>9%':'开发者持仓超9%','no_smart_money':'没有聪明钱买入','honeypot':'貔貅盘','mint_authority_active':'增发权限未放弃','freeze_authority_active':'冻结权限未放弃','authority_unknown':'读不到代币权限','no_jup_route':'无Jupiter路由'};
 const SK=['liquidity<20k','too_old','top10_unknown','bulk_snipe_1m','up>90%_in_40m','top10>42%','dev>9%','no_smart_money'];
 const e=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const rz=r=>{if(RZ[r])return RZ[r];if(/^score</.test(r))return '评分不足 '+r.slice(5);return r};
